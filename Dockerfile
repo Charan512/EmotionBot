@@ -1,5 +1,5 @@
 # Use python base image
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 # Create a non-root user (Hugging Face Spaces requirement)
 RUN useradd -m -u 1000 user
