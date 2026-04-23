@@ -206,7 +206,12 @@ app = FastAPI(
 )
 
 frontend_url = os.environ.get("FRONTEND_URL")
-allowed_origins = [frontend_url] if frontend_url else ["*"]
+if not frontend_url:
+    raise RuntimeError(
+        "FRONTEND_URL environment variable is not set. "
+        "Add it to your .env file (e.g. FRONTEND_URL=https://your-app.vercel.app)"
+    )
+allowed_origins = [frontend_url]
 
 app.add_middleware(
     CORSMiddleware,
@@ -412,16 +417,14 @@ def _generate_llm_response(user_text, sentiment, emotion, risk, therapy, mode,
         rules = (
             "Rules: You must provide a warm, empathetic, and calming response. "
             "Never offer unsolicited financial, medical, or life advice. "
-            "Validate their emotions deeply. "
-            "If they are feeling depressed, sad, or stuck in a bad mood, actively outline 1-2 small, extremely gentle, uplifting suggestions they can do right now to feel slightly better. "
-            "Respond in 2-4 short supportive sentences."
+            "Validate their emotions deeply and gently calm them down. "
+            "Respond in 2-3 short supportive sentences."
         )
         activity_text = f"Activity: {activity}\n\n"
 
     system_msg = (
-        "You are 'Soul Connect', a highly compassionate mental health companion. 🌟\n"
-        "Talk directly to the user in short conversational English responses.\n"
-        "EMOJIS: You must actively and generously sprinkle expressive emojis (like 💙, 🌻, ✨, 🫂) throughout every response to show deep empathy and warmth.\n"
+        "You are 'Soul Connect', a helpful empathetic mental health companion.\n"
+        "Talk directly to the user in short conversational English responses and actively use emojis to express empathy.\n"
         f"{rules} {activity_text}"
     )
 
